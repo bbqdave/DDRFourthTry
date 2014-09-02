@@ -1,10 +1,22 @@
 
 import processing.serial.*;
 
+import spacebrew.*;
+ 
+String server = "ws://localhost:9000";
+String name = "DDR_PROCESSING";
+String description = "Testing from processing ";
+Spacebrew spacebrewConnection;  // Spacebrew connection object
+ 
+
 Serial myPort;  // Create object from Serial class
 int val;      // Data received from the serial port
 int a;
 int m = 400;
+int oldVal = 0;
+
+
+
 
 void setup() 
 {
@@ -12,20 +24,34 @@ void setup()
  
   String portName = Serial.list()[0];          //Teensy 3.1 is on port 10
   myPort = new Serial(this, portName, 9600);
+  
+  spacebrewConnection = new Spacebrew( this );
+  
+  // add each thing you publish to
+  spacebrewConnection.addPublish( "selection", "string",true);
+  spacebrewConnection.addSubscribe("gameover","string"); 
+  spacebrewConnection.addSubscribe("userturn","string");
+
+ 
+  // connect to spacebrew
+  spacebrewConnection.connect(server, name, description );
 }
 
 void draw()
 {
   if ( myPort.available() > 0) {  // If data is available,
-    val = myPort.read();         // read it and store it in val
+    val = myPort.read();  
+   
   }
   
   
-  
+ 
 
   if (val == 0) {            
  fill(20,150,0);
  rect(0, 0, m, m);
+ 
+  
   } 
 
   if(val == 1) {           
@@ -42,6 +68,21 @@ fill(180,0,180);
    fill(20,50,190);
  rect(0, 0, m, m);
   }  
+
+  if(val> -1 && val <4)
+  {
+      if(oldVal!=val){
+       print("jeebus");
+       spacebrewConnection.send("selection",str(val));
+       
+      }
+        
+
+  }
+  oldVal= val;
+  print(val+"\n");
+  
+
   
 //  else{
 //      background(200);             // Set background to gray

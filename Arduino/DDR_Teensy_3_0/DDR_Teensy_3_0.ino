@@ -1,3 +1,8 @@
+
+#include <Adafruit_WS2801.h>
+
+
+
 #include "SPI.h"
 #include "Adafruit_WS2801.h"
 
@@ -57,18 +62,25 @@ void loop() {
 
  
  ratio = sens/1000;          //turn sensitivity into the ratio to compare w init
- Serial.println(ratio);
+// Serial.println(ratio);
  
  int len = strip.numPixels();
+ int index = -1;
+ float value;
+ boolean hasFound= false;
  for(int i=0;i<numOfAnalogInputs;i++){
    float reading = analogRead(i);
    float initReading = getInitialReading(i);
-   float value = reading/initReading;
+   value = reading/initReading;
    
    if(value > ratio){
      color = Wheel(50*i+random(0,20));
-     Serial.print(i, BYTE);
+      index=i;// something has been hit
+      hasFound = true;
+     // Serial.println(i);
+
    }else{
+     
      color = 0;
      sens = map(analogRead(A7), 0, 1024, 1010, 1500);
    }
@@ -79,8 +91,15 @@ void loop() {
      strip.show();
   //   Serial.println(value);
    }
+
  }
- 
+ if(hasFound){
+   Serial.print(index,BYTE);
+   
+ }else{
+   Serial.print(255,BYTE);
+ }
+
 //strip.show();
   
   delay(100);
