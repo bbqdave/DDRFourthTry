@@ -28,9 +28,10 @@ void setup()
   spacebrewConnection = new Spacebrew( this );
   
   // add each thing you publish to
-  spacebrewConnection.addPublish( "selection", "string",true);
+  spacebrewConnection.addPublish("selection", "string",true);
   spacebrewConnection.addSubscribe("gameover","string"); 
   spacebrewConnection.addSubscribe("userturn","string");
+  spacebrewConnection.addSubscribe("selection","string");
 
  
   // connect to spacebrew
@@ -44,14 +45,11 @@ void draw()
    
   }
   
-  
- 
 
-  if (val == 0) {            
- fill(20,150,0);
- rect(0, 0, m, m);
- 
   
+  if (val == 0) {            
+   fill(20,150,0);
+   rect(0, 0, m, m);
   } 
 
   if(val == 1) {           
@@ -72,21 +70,35 @@ fill(180,0,180);
   if(val> -1 && val <4)
   {
       if(oldVal!=val){
-       print("jeebus");
+      
        spacebrewConnection.send("selection",str(val));
-       
       }
-        
-
   }
   oldVal= val;
-  print(val+"\n");
-  
 
+}
+
+void onStringMessage( String name, String value ){
   
-//  else{
-//      background(200);             // Set background to gray
-//  }
+ print("got message"+name);
+
+  int message=0;
+  // do something here with the message 
+  if(name.indexOf("gameover")!=-1)
+  {
+     myPort.write(5);
+  }
+  
+  if(name.indexOf("userturn")!=-1)
+  {
+      myPort.write(6);
+  }
+  
+  if(name.indexOf("selection")!=-1){
+      myPort.write(int(value)-1);
+ 
+    
+  }
 }
 
 

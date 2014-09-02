@@ -30,14 +30,14 @@ void setup() {
    Serial.begin(9600); 
   strip.begin();
   strip.show();
-openingFlash();
+  openingFlash();
 
    Ainit = analogRead(0); 
    Binit = analogRead(1);
    Cinit = analogRead(2);
    Dinit = analogRead(3);
    sens = map(analogRead(A7), 0, 1024, 1200, 1700);     // sensitivity dictated by pot on A7
-  delay(500);
+   delay(500);
 }
 
 int getInitialReading(int analogInput){
@@ -58,9 +58,13 @@ int getInitialReading(int analogInput){
   
 }
 void loop() {
- 
 
- 
+int processingVal = Serial.read();
+if(processingVal > 0 && processingVal < 7)
+{
+  handleProcessingInput(processingVal);
+}
+
  ratio = sens/1000;          //turn sensitivity into the ratio to compare w init
 // Serial.println(ratio);
  
@@ -84,13 +88,8 @@ void loop() {
      color = 0;
      sens = map(analogRead(A7), 0, 1024, 1010, 1500);
    }
-   int loopStart = 6*i;
-   // loop for that group in lights
-   for(int x= loopStart;x<loopStart+6;x++){
-     strip.setPixelColor(x,color);
-     strip.show();
-  //   Serial.println(value);
-   }
+   
+   lightUpItem(i,color);
 
  }
  if(hasFound){
@@ -105,9 +104,43 @@ void loop() {
   delay(100);
 }
 
+// Handle Processing 
+void handleProcessingInput(int value)
+{
+  // SOMEONE HAS PRESSED
+  // NEED TO MAKE THIS REPEAT
+  if(value<5)
+  {
+    // we selected an item 
+     color = Wheel(50*value+random(0,20));
+     lightUpItem(value,color);
+  }
+ 
+  if(value == 5){
+    // GAME OVER -----------------
+    openingFlash();
+  }
+  if(value == 6)
+  {
+   // USER TURN _ NEED TO SIGNAL ITS FOR THEM
+   openingFlash();
+  }
+  
+  
+}
 
 
+void lightUpItem(int index, uint32_t c)
+{
 
+  int loopStart = 6*index;
+   // loop for that group in lights
+   for(int x= loopStart;x<loopStart+6;x++){
+     strip.setPixelColor(x,c);
+     strip.show();
+  //   Serial.println(value);
+   }
+}
 
 
 
